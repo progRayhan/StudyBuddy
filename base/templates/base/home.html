@@ -9,6 +9,7 @@
     {% for a in room %}
         <div>
             <a href="{% url 'update-room' a.id %}">Edit</a>
+            <a href="{% url 'delete-room' a.id %}">Delete</a>
             <span>@{{a.host.username}}</span>
             <h5>{{a.id}} - <a href="{% url 'room' a.id %}">{{a.name}}</a></h5>
             <small>{{a.topic.name}}</small>
