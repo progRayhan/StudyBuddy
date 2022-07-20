@@ -24,6 +24,7 @@
     </div>
 
     <div>
+        <h5>{{room_count}} rooms available</h5>
         {% for a in room %}
         <div>
             <a href="{% url 'update-room' a.id %}">Edit</a>
