@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
-from .models import Room
+from .models import Room, Topic
 from .forms import RoomForm
 
 # rooms = [
@@ -12,8 +12,11 @@ from .forms import RoomForm
 # Create your views here.
 def home(request):
     # return HttpResponse("Home Page")
-    rooms = Room.objects.all()
-    context = {'room':rooms}
+    # rooms = Room.objects.all()
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    rooms = Room.objects.filter(topic__name__icontains = q)
+    topics = Topic.objects.all()
+    context = {'room':rooms, 'topics':topics}
     return render(request, 'base/home.html', context)
 
 def room(request,pk):
