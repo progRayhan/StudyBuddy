@@ -3,9 +3,11 @@ from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
+from django.urls import is_valid_path
 from .models import Room, Topic
 from django.db.models import Q
 from .forms import RoomForm
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 # rooms = [
 #     {'id':1, 'name':'Mohammad Rayhan'},
@@ -15,11 +17,12 @@ from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def loginPage(request):
+    page = 'login'
     if request.user.is_authenticated:
         return redirect('home')
 
     if request.method == 'POST':
-        username = request.POST.get('username')
+        username = request.POST.get('username').lower()
         password = request.POST.get('password')
         try:
             user = User.objects.get(username=username)
@@ -34,12 +37,28 @@ def loginPage(request):
         else:
             messages.error(request, 'User and password does not exist')
 
-    context = {}
+    context = {'page':page}
     return render(request, 'base/login_register.html', context)
 
 def logoutUser(request):
     logout(request)
     return redirect('home')
+
+def registerPage(request):
+    # page = 'register'
+    form = UserCreationForm()
+
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.username = user.username.lower()
+            user.save()
+            login(request, user)
+            return redirect('home')
+        else:
+            messages.error(request, 'An error occured during registration')
+    return render(request, 'base/login_register.html', {'form':form})
 
 def home(request):
     # return HttpResponse("Home Page")
@@ -109,5 +128,3 @@ def deleteRoom(request,pk):
         room.delete()
         return redirect('home')
     return render(request, 'base/delete.html', {'obj':room})
-
-
